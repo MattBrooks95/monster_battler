@@ -49,11 +49,11 @@ library
 	exposed-modules: MyLib
 
 	-- Modules included in this library but not exported.
-	other-modules: {
+	other-modules:
 		Components.Health,
-		Primitives.Combat
-	}
-
+		Primitives.Combat,
+		Components.Component,
+		Interactions.Interaction
 
 	-- LANGUAGE extensions used by modules in this package.
 	-- other-extensions:
