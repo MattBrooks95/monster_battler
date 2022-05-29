@@ -20,8 +20,8 @@ main :: IO ()
 main = simpleHTTP nullConf $ msum
 	[
 	dir "signup" $ serveFile (asContentType "text/html") "static/index.html",
-	dir "account" $ ok $ toResponse "account page"
-	--dir "welcome" $ ok "welcome page",
-	--dir "api" $ ok "api endpoint",
+	dir "account" $ ok $ toResponse "account page",
+	dir "welcome" $ ok $ toResponse "welcome page",
+	dir "api" $ ok $ toResponse "api endpoint"
 	--seeOther "welcome" ""
 	]
