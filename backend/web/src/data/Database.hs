@@ -23,7 +23,10 @@ import Control.Monad.IO.Class (liftIO)
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Person
 	name String
-	age Int
+	deriving Show
+Account
+	ownerId PersonId
+	userName String
 	deriving Show
 |]
 
