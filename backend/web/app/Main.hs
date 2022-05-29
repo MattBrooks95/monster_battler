@@ -12,7 +12,9 @@ import Happstack.Server (
 		seeOther,
 		dir,
 		serveFile,
-		asContentType
+		asContentType,
+		serveDirectory,
+		Browsing(..)
 	)
 
 main :: IO ()
@@ -22,6 +24,7 @@ main = simpleHTTP nullConf $ msum
 	dir "signup" $ serveFile (asContentType "text/html") "static/index.html",
 	dir "account" $ ok $ toResponse "account page",
 	dir "welcome" $ ok $ toResponse "welcome page",
-	dir "api" $ ok $ toResponse "api endpoint"
+	dir "api" $ ok $ toResponse "api endpoint",
+	dir "static" $ serveDirectory DisableBrowsing [] "static"
 	--seeOther "welcome" ""
 	]
