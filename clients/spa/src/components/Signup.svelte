@@ -13,7 +13,11 @@ function submit() {
 			email,
 		}),
 	})
-	.then(response => console.log(response))
+	.then(response => {
+		console.log(response);
+		return response.text();
+	})
+	.then(responseText => console.log(responseText))
 	.catch((error) => {
 		console.log('error', error)
 	});
