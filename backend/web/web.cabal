@@ -29,6 +29,7 @@ library
   build-depends:
       base >=4.7 && <5
     , happstack-server
+    , monad-logger
     , persistent
     , persistent-postgresql
     , persistent-template
@@ -44,6 +45,7 @@ executable web-exe
   build-depends:
       base >=4.7 && <5
     , happstack-server
+    , monad-logger
     , persistent
     , persistent-postgresql
     , persistent-template
@@ -61,6 +63,7 @@ test-suite web-test
   build-depends:
       base >=4.7 && <5
     , happstack-server
+    , monad-logger
     , persistent
     , persistent-postgresql
     , persistent-template
