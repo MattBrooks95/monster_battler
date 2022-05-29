@@ -1,37 +1,37 @@
 <script>
 import Signup from "./Signup.svelte";
 
-let activePage = 0;
 const pages = [
-	"Home",
-	"Signup",
+	["Home", null],
+	["Signup", Signup],
+	["Accounts", null],
 ];
 
-function updatePage(newPage) {
-	console.log(`new active page:`, newPage);
-	activePage = newPage;
+let selectedComponent = pages[0][1];
+
+function updateSelectedComponent(newPageIndex) {
+	if (pages.length <= newPageIndex) {
+		throw new Error(`component picker index:${index} went out of bounds`);
+	}
+	selectedComponent = pages[newPageIndex][1];
+	console.log(`new active page:`, newPageIndex);
 }
 </script>
 
 <div class="flexcol fill_space">
 <div class="flexrow">
 {#each pages as page, index}
-<button on:click={() => updatePage(index)}>{page}</button>
+<button on:click={() => updateSelectedComponent(index)}>{page[0]}</button>
 {/each}
 </div>
-{#if activePage === 0}
-home
-{:else if activePage === 1}
-<Signup/>
-{:else}
-default
-{/if}
+
+<svelte:component this={selectedComponent}/>
 </div>
 
 <style>
-.fill_width {
+/*.fill_width {
 	width: 100%;
-}
+}*/
 
 .fill_space {
 	width: 100%;
