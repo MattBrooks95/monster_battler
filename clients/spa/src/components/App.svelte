@@ -1,4 +1,7 @@
 <script>
+import Signup from "./Signup.svelte";
 </script>
 
-<div>svelte</div>
+<div>
+<Signup/>
+</div>
