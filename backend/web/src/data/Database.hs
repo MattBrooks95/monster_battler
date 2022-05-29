@@ -30,6 +30,7 @@ Person
 -- TODO can't do this in production
 connStr = "host=localhost dbname=monster_battler user=monster_battler password=monster_battler port=5432"
 
+-- one-off scripts like this can be run from the repl!!!
 main:: IO()
 main = runStderrLoggingT $ withPostgresqlPool connStr 10 $ \ pool -> liftIO $ do
 	flip runSqlPersistMPool pool $ do
