@@ -18,7 +18,8 @@ import Happstack.Server (
 		Method(..),
 		method,
 		ServerPartT,
-		ToMessage
+		ToMessage,
+		Response
 	)
 
 main :: IO ()
@@ -45,6 +46,7 @@ main = simpleHTTP nullConf $ msum
 --personHandler :: ServerPartT IO String
 --personHandler = return (method PUT (return ok $ toResponse "api/person"))
 
+api :: ServerPartT IO Response
 api = msum
 	[
 		dir "person" $ ok $ toResponse "api/person"
