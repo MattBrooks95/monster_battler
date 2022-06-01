@@ -62,7 +62,14 @@ person :: ServerPartT IO Response
 --	]
 person = msum
 	[
-		method PUT >> (ok $ toResponse "api/person put")--,
-		--do method GET (ok $ toResponse "api/person get"),
-		--do method POST (ok $ toResponse "api/person post")
+		--so, method PUT does nothing besides control which code branch is ran, based on the request
+		--that is why the happstack tutorial was using do notation
+		--but for some reason, do notation did not work when I tried it
+		--if it was because of whitespace or indentation, that's just silly
+		--this is the same as the happstack guide, doesn't work because "Couldn't match type ‘()’ with ‘Response -> ServerPartT IO Response’"
+		--do method PUT
+		--	(return (ok $ toResponse "api/person put"))
+		--this works and I think this syntax is nicer, but why does the do block not work?
+		--the thing1 >> thing2 operator does thing1, ignores any return value it might have had, and then returns the result of thing2
+		method PUT >> (ok $ toResponse "api/person put")
 	]
