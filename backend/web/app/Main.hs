@@ -60,3 +60,9 @@ person :: ServerPartT IO Response
 --	[
 --		ok $ toResponse "api/person"
 --	]
+person = msum
+	[
+		method PUT >> (ok $ toResponse "api/person put")--,
+		--do method GET (ok $ toResponse "api/person get"),
+		--do method POST (ok $ toResponse "api/person post")
+	]
