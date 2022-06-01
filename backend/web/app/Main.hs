@@ -49,5 +49,14 @@ main = simpleHTTP nullConf $ msum
 api :: ServerPartT IO Response
 api = msum
 	[
-		dir "person" $ ok $ toResponse "api/person"
+		dir "person" person
 	]
+
+person :: ServerPartT IO Response
+-- this works
+-- person = ok $ toResponse "api/person"
+--so does this
+--person = msum
+--	[
+--		ok $ toResponse "api/person"
+--	]
