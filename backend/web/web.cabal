@@ -38,6 +38,8 @@ library
 executable web-exe
   main-is: Main.hs
   other-modules:
+      Api
+      Api.Person
       Paths_web
   hs-source-dirs:
       app
