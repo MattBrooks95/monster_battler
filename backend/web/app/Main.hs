@@ -74,7 +74,13 @@ person = msum
 		--like this
 		do
 			method PUT
-			ok $ toResponse "api/person put"
+			ok $ toResponse "api/person put",
+		do
+			method GET
+			ok $ toResponse "api/person get",
+		do
+			method DELETE
+			ok $ toResponse "api/person delete"
 
 
 		--this works and I think this syntax is nicer, but why does the do block not work?
