@@ -49,7 +49,8 @@ packages:
 # extra-package-dbs: []
 
 # Control whether we use the GHC we find on the path
-# system-ghc: true
+# there's a bug, it was said that we need to turn this on https://www.reddit.com/r/haskell/comments/ucmo1t/ann_haskell_language_server_1700/
+system-ghc: true
 #
 # Require a specific version of stack, using version ranges
 # require-stack-version: -any # Default

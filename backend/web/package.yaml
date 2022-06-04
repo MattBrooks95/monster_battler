@@ -26,6 +26,8 @@ dependencies:
 - persistent-postgresql
 - persistent-template
 - monad-logger
+- aeson
+- bytestring
 
 library:
   source-dirs: src

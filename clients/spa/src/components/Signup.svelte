@@ -8,9 +8,10 @@ function submit() {
 		headers: {
 			'Content-Type': 'application/json',
 		},
+		//worry about email and whatnot later
+		//on the server, only grabbing the name for now
 		body: JSON.stringify({
 			name,
-			email,
 		}),
 	})
 	.then(response => {
