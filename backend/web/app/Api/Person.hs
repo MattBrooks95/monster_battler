@@ -46,13 +46,13 @@ person = msum
 			method PUT
 			request <- askRq
 			body <- liftIO $ takeRequestBody request
-			getBodyAsJson body
-		--do
-		--	method GET
-		--	ok $ toResponse "api/person get",
-		--do
-		--	method DELETE
-		--	ok $ toResponse "api/person delete"
+			getBodyAsJson body,
+		do
+			method GET
+			ok $ toResponse "api/person get",
+		do
+			method DELETE
+			ok $ toResponse "api/person delete"
 	]
 
 getBodyAsJson :: Maybe RqBody -> ServerPartT IO Response
