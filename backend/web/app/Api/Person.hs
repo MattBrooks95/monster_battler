@@ -46,7 +46,10 @@ person = msum
 			method PUT
 			request <- askRq
 			body <- liftIO $ takeRequestBody request
-			getBodyAsJson body,
+			let bodyAsJson = getBodyAsJson body
+			case bodyAsJson of
+				Nothing -> ok $ toResponse "request body decode failure"
+				Just bodyAsJson -> ok $ toResponse $ show bodyAsJson,
 		do
 			method GET
 			ok $ toResponse "api/person get",
@@ -55,15 +58,16 @@ person = msum
 			ok $ toResponse "api/person delete"
 	]
 
-getBodyAsJson :: Maybe RqBody -> ServerPartT IO Response
+getBodyAsJson :: Maybe RqBody -> Maybe PersonJson
 getBodyAsJson body =
 	case body of
 		Just bodySuccess -> do
 			-- declaring PersonJson here was necessary to resolve a type ambiguity that
 			-- the compiler complained about
 			let fromJson = decode (unBody bodySuccess) :: Maybe PersonJson
-			let response = case fromJson of
-				Just jsonSuccess -> ok $ toResponse $ show jsonSuccess
-				Nothing -> ok $ toResponse "died because of json decode failure"
-			response
-		Nothing -> ok $ toResponse "died because takeRequestBody failure"
+			fromJson
+			--let response = case fromJson of
+			--	Just jsonSuccess -> ok $ toResponse $ show jsonSuccess
+			--	Nothing -> ok $ toResponse "died because of json decode failure"
+			--response
+		Nothing -> Nothing
