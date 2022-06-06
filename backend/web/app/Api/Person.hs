@@ -32,13 +32,6 @@ import Happstack.Server (
 
 data PersonJson = PersonJson { name::String } deriving (Show, Generic, ToJSON, FromJSON)
 
--- this works
--- person = ok $ toResponse "api/person"
---so does this
---person = msum
---	[
---		ok $ toResponse "api/person"
---	]
 person :: ServerPartT IO Response
 person = msum
 	[
@@ -62,12 +55,6 @@ getBodyAsJson :: Maybe RqBody -> Maybe PersonJson
 getBodyAsJson body =
 	case body of
 		Just bodySuccess -> do
-			-- declaring PersonJson here was necessary to resolve a type ambiguity that
-			-- the compiler complained about
 			let fromJson = decode (unBody bodySuccess) :: Maybe PersonJson
 			fromJson
-			--let response = case fromJson of
-			--	Just jsonSuccess -> ok $ toResponse $ show jsonSuccess
-			--	Nothing -> ok $ toResponse "died because of json decode failure"
-			--response
 		Nothing -> Nothing
