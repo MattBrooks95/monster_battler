@@ -15,7 +15,10 @@ module Api.Person where
 
 import Control.Monad
 import Control.Monad.IO.Class
-import Control.Monad.Logger    (runStderrLoggingT)
+import Control.Monad.Logger (
+		runStderrLoggingT,
+		runNoLoggingT
+	)
 
 import GHC.Generics
 
@@ -26,6 +29,10 @@ import Data.Maybe
 import Database.Persist
 import Database.Persist.Postgresql
 import Database.Persist.TH
+
+import Data.Database (
+		Person(..)
+	)
 
 import qualified Data.ByteString.Lazy as LB
 
@@ -48,12 +55,6 @@ import Happstack.Server (
 
 data PersonJson = PersonJson { name::String } deriving (Show, Generic, ToJSON, FromJSON)
 
--- TODO can't do this in production
--- TODO you copy and pasted this
-connStr = "host=localhost dbname=monster_battler user=monster_battler password=monster_battler port=5432"
-
---runStderrLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
---flip runSqlPersistMPool pool $ do
 
 person :: ServerPartT IO Response
 person = msum [
@@ -83,5 +84,13 @@ getBodyAsJson body =
 			fromJson
 		Nothing -> Nothing
 
+-- TODO can't do this in production
+-- TODO you copy and pasted this
+connStr = "host=localhost dbname=monster_battler user=monster_battler password=monster_battler port=5432"
+
+--runStderrLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
+--flip runSqlPersistMPool pool $ do
 insertPerson :: PersonJson -> IO ()
-insertPerson person = return ()
+insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
+	personId <- flip runSqlPersistMPool pool $ insert $ Person $ name person
+	putStrLn $ show personId
