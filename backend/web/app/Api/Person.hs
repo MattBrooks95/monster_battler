@@ -106,10 +106,15 @@ insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> l
 
 --TODO figure out how to properly use this connection pool, and only
 --instantiate one, doing it here and in insertPerson is probably really not good
-getPeople :: IO ()
+--in ghci, I was playing around with how to get the actual Person values out of these
+--io actions:
+--ghci> fmap (\x -> fmap entityVal x) myPeople
+--[Person {personName = "success"},Person {personName = "person 2"}]
+--there's gotta be abetter way than calling fmap twice
+getPeople :: IO [Entity Person]
 getPeople = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
 	people  <- (flip runSqlPersistMPool pool $ selectList [] []) :: IO [Entity Person]
-	print $ "recordName:" ++ (show people)
+	--print $ "recordName:" ++ (show people)
 	--return people
-	return ()
+	return people
 
