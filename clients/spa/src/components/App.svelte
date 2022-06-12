@@ -1,10 +1,12 @@
 <script>
 import Signup from "./Signup.svelte";
+import Admin from "./Admin.svelte";
 
 const pages = [
 	["Home", null],
 	["Signup", Signup],
 	["Accounts", null],
+	["Admin", Admin],
 ];
 
 let selectedComponent = pages[0][1];

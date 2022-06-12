@@ -67,7 +67,10 @@ person = msum [
 						Nothing -> ok $ toResponse ("request body decode failure":: String)
 						Just bodyAsJson -> do
 							liftIO $ insertPerson bodyAsJson
-							ok $ toResponse $ show bodyAsJson
+							ok $ toResponse $ show bodyAsJson,
+				do
+					method GET
+					ok $ toResponse ("api/person get" :: String)
 				--do
 				--	method GET
 				--	ok $ toResponse "api/person get",
