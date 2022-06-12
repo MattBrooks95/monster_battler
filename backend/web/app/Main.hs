@@ -32,6 +32,7 @@ main = simpleHTTP nullConf $ msum
 	[
 	dir "signup" $ serveFile (asContentType "text/html") "static/index.html",
 	dir "static" $ serveDirectory DisableBrowsing [] "static",
+	dir "api" api
 	--dir "admin" admin
 	--do dir "account" $ ok $ toResponse "account page",
 	--do dir "welcome" $ ok $ toResponse "welcome page",

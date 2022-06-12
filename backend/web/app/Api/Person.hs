@@ -27,6 +27,9 @@ import Data.Aeson.Types
 import Data.Maybe
 
 import Database.Persist
+import Database.Persist.Class.PersistEntity (
+		recordName
+	)
 import Database.Persist.Postgresql
 import Database.Persist.TH
 
@@ -70,6 +73,9 @@ person = msum [
 							ok $ toResponse $ show bodyAsJson,
 				do
 					method GET
+					--people <- getPeople
+					liftIO getPeople
+					--liftIO $ print people
 					ok $ toResponse ("api/person get" :: String)
 				--do
 				--	method GET
@@ -97,3 +103,13 @@ insertPerson :: PersonJson -> IO ()
 insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
 	personId <- flip runSqlPersistMPool pool $ insert $ Person $ name person
 	putStrLn $ show personId
+
+--TODO figure out how to properly use this connection pool, and only
+--instantiate one, doing it here and in insertPerson is probably really not good
+getPeople :: IO ()
+getPeople = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
+	people  <- (flip runSqlPersistMPool pool $ selectList [] []) :: IO [Entity Person]
+	print $ "recordName:" ++ (show people)
+	--return people
+	return ()
+
