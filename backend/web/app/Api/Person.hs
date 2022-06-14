@@ -111,6 +111,19 @@ insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> l
 --ghci> fmap (\x -> fmap entityVal x) myPeople
 --[Person {personName = "success"},Person {personName = "person 2"}]
 --there's gotta be abetter way than calling fmap twice
+--I learned that I can do this:
+--let myPeople = getPeople
+--ghci> fmap (map entityVal) myPeople
+--[Person {personName = "first person in database!!!"},Person {personName = "name 2"}]
+--`fmap entityVal person` is no good because it is prepared to handle the IO monad, but it is not
+--prepared to also handle the List monad. `map entityVal` uses partial function application
+--to create a function that has the type map entityVal :: [Entity b] -> [b]
+--which is a pure function that turns People Entities (from the Database library), into People objects
+--so, by passing that into fmap, we get this:
+--ghci> :t fmap (map entityVal)
+--fmap (map entityVal) :: Functor f => f [Entity b] -> f [b]
+--so, this code can turn Entities in the IO monad into People in the IO monad
+--I should be able to continue this train of thought to be able to go from Database Object -> JSON
 getPeople :: IO [Entity Person]
 getPeople = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
 	people  <- (flip runSqlPersistMPool pool $ selectList [] []) :: IO [Entity Person]
