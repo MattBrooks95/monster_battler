@@ -131,4 +131,4 @@ insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> l
 --	return people
 
 getPeople :: IO [Entity Person]
-getPeople = runNoLoggingT $ withPostgresqlConn connStr $ (\backend -> runReaderT (selectList [] []) backend)
+getPeople = runNoLoggingT $ withPostgresqlConn connStr $ \backend -> runReaderT (selectList [] []) backend
