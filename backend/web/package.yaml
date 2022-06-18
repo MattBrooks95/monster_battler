@@ -28,6 +28,7 @@ dependencies:
 - monad-logger
 - aeson
 - bytestring
+- mtl
 
 library:
   source-dirs: src

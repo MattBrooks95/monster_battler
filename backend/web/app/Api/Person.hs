@@ -34,7 +34,8 @@ import Database.Persist.Postgresql
 import Database.Persist.TH
 
 import Data.Database (
-		Person(..)
+		Person(..),
+		connStr
 	)
 
 import qualified Data.ByteString.Lazy as LB
@@ -55,6 +56,8 @@ import Happstack.Server (
 		unBody,
 		RqBody
 	)
+
+import Control.Monad.Reader
 
 data PersonJson = PersonJson { name::String } deriving (Show, Generic, ToJSON, FromJSON)
 
@@ -93,10 +96,6 @@ getBodyAsJson body =
 			fromJson
 		Nothing -> Nothing
 
--- TODO can't do this in production
--- TODO you copy and pasted this
-connStr = "host=localhost dbname=monster_battler user=monster_battler password=monster_battler port=5432"
-
 --runStderrLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
 --flip runSqlPersistMPool pool $ do
 insertPerson :: PersonJson -> IO ()
@@ -124,10 +123,12 @@ insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> l
 --fmap (map entityVal) :: Functor f => f [Entity b] -> f [b]
 --so, this code can turn Entities in the IO monad into People in the IO monad
 --I should be able to continue this train of thought to be able to go from Database Object -> JSON
-getPeople :: IO [Entity Person]
-getPeople = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
-	people  <- (flip runSqlPersistMPool pool $ selectList [] []) :: IO [Entity Person]
-	--print $ "recordName:" ++ (show people)
-	--return people
-	return people
+--getPeople :: IO [Entity Person]
+--getPeople = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
+--	people  <- (flip runSqlPersistMPool pool $ selectList [] []) :: IO [Entity Person]
+--	--print $ "recordName:" ++ (show people)
+--	--return people
+--	return people
 
+getPeople :: IO [Entity Person]
+getPeople = runNoLoggingT $ withPostgresqlConn connStr $ (\backend -> runReaderT (selectList [] []) backend)

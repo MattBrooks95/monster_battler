@@ -33,6 +33,7 @@ library
     , bytestring
     , happstack-server
     , monad-logger
+    , mtl
     , persistent
     , persistent-postgresql
     , persistent-template
@@ -53,6 +54,7 @@ executable web-exe
     , bytestring
     , happstack-server
     , monad-logger
+    , mtl
     , persistent
     , persistent-postgresql
     , persistent-template
@@ -73,6 +75,7 @@ test-suite web-test
     , bytestring
     , happstack-server
     , monad-logger
+    , mtl
     , persistent
     , persistent-postgresql
     , persistent-template
