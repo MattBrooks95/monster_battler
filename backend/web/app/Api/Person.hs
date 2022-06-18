@@ -98,10 +98,11 @@ getBodyAsJson body =
 
 --runStderrLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
 --flip runSqlPersistMPool pool $ do
-insertPerson :: PersonJson -> IO ()
-insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
-	personId <- flip runSqlPersistMPool pool $ insert $ Person $ name person
-	putStrLn $ show personId
+insertPerson :: PersonJson -> IO (Database.Persist.Postgresql.Key Person)
+--insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
+--	personId <- flip runSqlPersistMPool pool $ insert $ Person $ name person
+--	putStrLn $ show personId
+insertPerson person = runNoLoggingT $ withPostgresqlConn connStr $ \backend -> runReaderT (insert $ Person $ name person) backend
 
 --TODO figure out how to properly use this connection pool, and only
 --instantiate one, doing it here and in insertPerson is probably really not good
@@ -132,3 +133,4 @@ insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> l
 
 getPeople :: IO [Entity Person]
 getPeople = runNoLoggingT $ withPostgresqlConn connStr $ \backend -> runReaderT (selectList [] []) backend
+
