@@ -54,12 +54,13 @@ import Happstack.Server (
 		askRq,
 		takeRequestBody,
 		unBody,
-		RqBody
+		RqBody,
+		badRequest
 	)
 
 import Control.Monad.Reader
 
-data PersonJson = PersonJson { name::String } deriving (Show, Generic, ToJSON, FromJSON)
+--data PersonJson = PersonJson { name::String } deriving (Show, Generic, ToJSON, FromJSON)
 
 
 person :: ServerPartT IO Response
@@ -68,12 +69,25 @@ person = msum [
 					method PUT
 					request <- askRq
 					body <- liftIO $ takeRequestBody request
-					let bodyAsJson = getBodyAsJson body
-					case bodyAsJson of
-						Nothing -> ok $ toResponse ("request body decode failure":: String)
-						Just bodyAsJson -> do
-							liftIO $ insertPerson bodyAsJson
-							ok $ toResponse $ show bodyAsJson,
+					case body of
+						Just body -> do
+							bodyJson <- decode body
+							case bodyJson of
+								Just bodyJson -> do
+									personId <- insertPerson bodyJson
+									ok $ toResponse $ "added person" ++ personId
+								Nothing -> do
+									print "couldn't decode the request's json"
+									badRequest $ toResponse "couldn't decode the request's json"
+						Nothing -> do
+							print "Couldn't get body from request"
+							badRequest $ toResponse "Couldn't get body from request",
+					--let bodyAsJson = getBodyAsJson body
+					--case bodyAsJson of
+					--	Nothing -> ok $ toResponse ("request body decode failure":: String)
+					--	Just bodyAsJson -> do
+					--		liftIO $ insertPerson (decode bodyAsJson)
+					--		ok $ toResponse $ show bodyAsJson,
 				do
 					method GET
 					--people <- getPeople
@@ -88,21 +102,24 @@ person = msum [
 				--	ok $ toResponse "api/person delete"
 			]
 
-getBodyAsJson :: Maybe RqBody -> Maybe PersonJson
-getBodyAsJson body =
-	case body of
-		Just bodySuccess -> do
-			let fromJson = decode (unBody bodySuccess) :: Maybe PersonJson
-			fromJson
-		Nothing -> Nothing
+getBodyFromRequest :: RqBody -> LB.ByteString
+getBodyFromRequest requestBody = unBody requestBody
+
+--getBodyAsJson :: Maybe RqBody -> Maybe PersonJson
+--getBodyAsJson body =
+--	case body of
+--		Just bodySuccess -> do
+--			let fromJson = decode (unBody bodySuccess) :: Maybe PersonJson
+--			fromJson
+--		Nothing -> Nothing
 
 --runStderrLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
 --flip runSqlPersistMPool pool $ do
-insertPerson :: PersonJson -> IO (Database.Persist.Postgresql.Key Person)
+insertPerson :: Person -> IO (Database.Persist.Postgresql.Key Person)
 --insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
 --	personId <- flip runSqlPersistMPool pool $ insert $ Person $ name person
 --	putStrLn $ show personId
-insertPerson person = runNoLoggingT $ withPostgresqlConn connStr $ \backend -> runReaderT (insert $ Person $ name person) backend
+insertPerson person = runNoLoggingT $ withPostgresqlConn connStr $ \backend -> runReaderT (insert $ person) backend
 
 --TODO figure out how to properly use this connection pool, and only
 --instantiate one, doing it here and in insertPerson is probably really not good
