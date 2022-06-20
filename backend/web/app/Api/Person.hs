@@ -68,39 +68,30 @@ person = msum [
 				do
 					method PUT
 					request <- askRq
-					body <- liftIO $ takeRequestBody request
-					case body of
-						Just body -> do
-							bodyJson <- decode $ unBody body
-							case bodyJson of
-								Just bodyJson -> do
-									personId <- liftM insertPerson bodyJson
-									ok $ toResponse $ "added person" ++ (show personId)
-								Nothing -> do
-									liftM print "couldn't decode the request's json"
-									badRequest $ toResponse "couldn't decode the request's json"
-						Nothing -> do
-							liftM print "Couldn't get body from request"
-							badRequest $ toResponse "Couldn't get body from request",
-					--let bodyAsJson = getBodyAsJson body
-					--case bodyAsJson of
-					--	Nothing -> ok $ toResponse ("request body decode failure":: String)
-					--	Just bodyAsJson -> do
-					--		liftIO $ insertPerson (decode bodyAsJson)
-					--		ok $ toResponse $ show bodyAsJson,
-				do
-					method GET
-					--people <- getPeople
-					liftIO getPeople
-					--liftIO $ print people
-					ok $ toResponse ("api/person get" :: String)
+					body <- takeRequestBody request
+					let personObjectFromRequest = getPersonFromBody body
+					case personObjectFromRequest of
+						Nothing -> badRequest $ toResponse ("failure to decode request body or JSON" :: String)
+						Just person -> ok $ toResponse ("TODO" :: String)
+					--ok $ toResponse ("TODO" :: String)
+					--case personObjectFromRequest of 
+					--	Just person -> do
+					--		personId <- insertPerson (person :: Person)
+					--		ok $ toResponse $ "added person" ++ (show personId)
+					--	Nothing -> badRequest $ toResponse ("failure to decode request body or JSON" :: String)--,
+				--do
+				--	method GET
+				--	--people <- getPeople
+				--	liftIO getPeople
+				--	--liftIO $ print people
+				--	ok $ toResponse ("api/person get" :: String)
 				--do
 				--	method GET
 				--	ok $ toResponse "api/person get",
 				--do
 				--	method DELETE
 				--	ok $ toResponse "api/person delete"
-			]
+			] :: ServerPartT IO Response
 
 getBodyFromRequest :: RqBody -> LB.ByteString
 getBodyFromRequest requestBody = unBody requestBody
@@ -113,6 +104,16 @@ getBodyFromRequest requestBody = unBody requestBody
 --			fromJson
 --		Nothing -> Nothing
 
+getPersonFromBody :: Maybe (RqBody) -> Maybe Person
+getPersonFromBody body = case body of
+	Just body -> do
+		fromJson <- decode $ unBody body
+		case fromJson of
+			Just person -> person
+			Nothing -> Nothing
+	Nothing -> Nothing
+
+--TODO this code can be moved to a database module
 --runStderrLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
 --flip runSqlPersistMPool pool $ do
 insertPerson :: Person -> IO (Database.Persist.Postgresql.Key Person)
