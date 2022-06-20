@@ -71,16 +71,16 @@ person = msum [
 					body <- liftIO $ takeRequestBody request
 					case body of
 						Just body -> do
-							bodyJson <- decode body
+							bodyJson <- decode $ unBody body
 							case bodyJson of
 								Just bodyJson -> do
-									personId <- insertPerson bodyJson
-									ok $ toResponse $ "added person" ++ personId
+									personId <- liftM insertPerson bodyJson
+									ok $ toResponse $ "added person" ++ (show personId)
 								Nothing -> do
-									print "couldn't decode the request's json"
+									liftM print "couldn't decode the request's json"
 									badRequest $ toResponse "couldn't decode the request's json"
 						Nothing -> do
-							print "Couldn't get body from request"
+							liftM print "Couldn't get body from request"
 							badRequest $ toResponse "Couldn't get body from request",
 					--let bodyAsJson = getBodyAsJson body
 					--case bodyAsJson of
