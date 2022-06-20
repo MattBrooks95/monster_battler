@@ -72,7 +72,9 @@ person = msum [
 					let personObjectFromRequest = getPersonFromBody body
 					case personObjectFromRequest of
 						Nothing -> badRequest $ toResponse ("failure to decode request body or JSON" :: String)
-						Just person -> ok $ toResponse ("TODO" :: String)
+						Just person -> do
+							personId <- liftIO $ insertPerson person
+							ok $ toResponse ("added person" ++ (show personId))
 					--ok $ toResponse ("TODO" :: String)
 					--case personObjectFromRequest of 
 					--	Just person -> do
