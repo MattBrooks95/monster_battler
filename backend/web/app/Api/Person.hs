@@ -70,6 +70,7 @@ person = msum [
 					request <- askRq
 					body <- takeRequestBody request
 					let personObjectFromRequest = getPersonFromBody body
+					liftIO $ print (show personObjectFromRequest)
 					case personObjectFromRequest of
 						Nothing -> badRequest $ toResponse ("failure to decode request body or JSON" :: String)
 						Just person -> do
@@ -106,13 +107,9 @@ getBodyFromRequest requestBody = unBody requestBody
 --			fromJson
 --		Nothing -> Nothing
 
-getPersonFromBody :: Maybe (RqBody) -> Maybe Person
+getPersonFromBody :: Maybe RqBody -> Maybe Person
 getPersonFromBody body = case body of
-	Just body -> do
-		fromJson <- decode $ unBody body
-		case fromJson of
-			Just person -> person
-			Nothing -> Nothing
+	Just body -> (decode $ unBody body :: Maybe Person)
 	Nothing -> Nothing
 
 --TODO this code can be moved to a database module
