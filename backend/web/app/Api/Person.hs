@@ -69,6 +69,9 @@ person = msum [
 					method PUT
 					request <- askRq
 					body <- takeRequestBody request
+					case body of
+						Just body -> liftIO $ print "just body"
+						Nothing -> liftIO $ print "take body failure"
 					let personObjectFromRequest = getPersonFromBody body
 					liftIO $ print (show personObjectFromRequest)
 					case personObjectFromRequest of
@@ -109,7 +112,7 @@ getBodyFromRequest requestBody = unBody requestBody
 
 getPersonFromBody :: Maybe RqBody -> Maybe Person
 getPersonFromBody body = case body of
-	Just body -> (decode $ unBody body :: Maybe Person)
+	Just body -> (decode $ unBody body)
 	Nothing -> Nothing
 
 --TODO this code can be moved to a database module

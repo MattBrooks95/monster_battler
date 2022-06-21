@@ -11,7 +11,7 @@ function submit() {
 		//worry about email and whatnot later
 		//on the server, only grabbing the name for now
 		body: JSON.stringify({
-			name,
+			personName: name,
 		}),
 	})
 	.then(response => {
