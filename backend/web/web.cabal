@@ -32,12 +32,14 @@ library
       aeson
     , base >=4.7 && <5
     , bytestring
+    , containers
     , happstack-server
     , monad-logger
     , mtl
     , persistent
     , persistent-postgresql
     , persistent-template
+    , utf8-string
   default-language: Haskell2010
 
 executable web-exe
@@ -53,12 +55,14 @@ executable web-exe
       aeson
     , base >=4.7 && <5
     , bytestring
+    , containers
     , happstack-server
     , monad-logger
     , mtl
     , persistent
     , persistent-postgresql
     , persistent-template
+    , utf8-string
     , web
   default-language: Haskell2010
 
@@ -74,11 +78,13 @@ test-suite web-test
       aeson
     , base >=4.7 && <5
     , bytestring
+    , containers
     , happstack-server
     , monad-logger
     , mtl
     , persistent
     , persistent-postgresql
     , persistent-template
+    , utf8-string
     , web
   default-language: Haskell2010

@@ -24,6 +24,11 @@ import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Types
 import Data.Maybe
+import Data.Map (
+		Map
+	)
+
+import qualified Data.Map as Map
 
 import Database.Persist
 import Database.Persist.Class.PersistEntity (
@@ -43,9 +48,13 @@ import Data.Person (
 	)
 
 import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Lazy.UTF8 as UC(
+		fromString,
+	)
 
 import Happstack.Server (
 		ServerPartT,
+		ServerPart,
 		Response,
 		dir,
 		Method(GET, PUT, DELETE),
@@ -64,34 +73,53 @@ import Happstack.Server (
 
 import Control.Monad.Reader
 
-person :: ServerPartT IO Response
+person :: ServerPart Response
 person = msum [
-				do
-					method PUT
-					request <- askRq
-					body <- takeRequestBody request
-					case body of
-						Just body -> liftIO $ print "just body"
-						Nothing -> liftIO $ print "take body failure"
-					let personObjectFromRequest = getPersonFromBody body
-					liftIO $ print (show personObjectFromRequest)
-					case personObjectFromRequest of
-						Nothing -> badRequest $ toResponse ("failure to decode request body or JSON" :: String)
-						Just person -> do
-							personId <- liftIO $ insertPerson person
-							ok $ toResponse ("added person" ++ (show personId))
-					--ok $ toResponse ("TODO" :: String)
-					--case personObjectFromRequest of 
-					--	Just person -> do
-					--		personId <- insertPerson (person :: Person)
-					--		ok $ toResponse $ "added person" ++ (show personId)
-					--	Nothing -> badRequest $ toResponse ("failure to decode request body or JSON" :: String)--,
 				--do
-				--	method GET
-				--	--people <- getPeople
-				--	liftIO getPeople
-				--	--liftIO $ print people
-				--	ok $ toResponse ("api/person get" :: String)
+				--	method PUT
+				--	request <- askRq
+				--	body <- takeRequestBody request
+				--	case body of
+				--		Just body -> liftIO $ print "just body"
+				--		Nothing -> liftIO $ print "take body failure"
+				--	let personObjectFromRequest = getPersonFromBody body
+				--	liftIO $ print (show personObjectFromRequest)
+				--	case personObjectFromRequest of
+				--		Nothing -> badRequest $ toResponse ("failure to decode request body or JSON" :: String)
+				--		Just person -> do
+				--			personId <- liftIO $ insertPerson person
+				--			ok $ toResponse ("added person" ++ (show personId))
+				--, do
+				do
+					method GET
+					--get people entities from database
+					peopleEntities <- liftIO getPeople
+					liftIO $ print "########################"
+					liftIO $ print peopleEntities
+					-- convert the entities into actual person objects
+					liftIO $ print "########################"
+					let people = map entityVal peopleEntities
+					liftIO $ print people
+
+					let jsonPeople = encode people
+					liftIO $ print "#####################"
+					liftIO $ print jsonPeople
+					--ok $ toResponse jsonPeople
+					ok $ toResponse jsonPeople
+
+					--liftIO $ print people
+					--let entityPeople = toEntities people
+					--liftIO $ print entityPeople
+					--jsonPeople <- entitiesToJson $ toEntities people
+					--liftIO $ print jsonPeople
+					--couldn't match type IO [LB.ByteString] with IO [LB.ByteString]
+					--let responseMap = Map.fromList ([("people", entitiesToJson $ toEntities people)]) :: Map.Map String [LB.ByteString]
+					--let responseMap = Map.fromList ([("people", entitiesToJson $ toEntities people)]) :: Map.Map String (IO [LB.ByteString])
+					--jsonPeople <- entitiesToJson $ toEntities people-- :: IO [LB.ByteString]
+					--responseMap <- Map.fromList ([("people", jsonPeople)]) :: Map.Map String [LB.ByteString]
+					--ok $ toResponse $ fmap encode responseMap
+					--ok $ toResponse jsonPeople
+					--ok $ toResponse ("compile" :: String)
 				--do
 				--	method GET
 				--	ok $ toResponse "api/person get",
@@ -103,13 +131,12 @@ person = msum [
 getBodyFromRequest :: RqBody -> LB.ByteString
 getBodyFromRequest requestBody = unBody requestBody
 
---getBodyAsJson :: Maybe RqBody -> Maybe PersonJson
---getBodyAsJson body =
---	case body of
---		Just bodySuccess -> do
---			let fromJson = decode (unBody bodySuccess) :: Maybe PersonJson
---			fromJson
---		Nothing -> Nothing
+toEntities :: Functor f => f [Entity b] -> f [b]
+toEntities = fmap $ map entityVal
+
+--entitiesToJson :: (Functor f, ToJSON a) => f [a] -> f [Data.ByteString.Lazy.Internal.ByteString]
+entitiesToJson :: (Functor f, ToJSON a) => f [a] -> f [LB.ByteString]
+entitiesToJson = fmap (map encode)
 
 getPersonFromBody :: Maybe RqBody -> Maybe Person
 getPersonFromBody body = case body of
