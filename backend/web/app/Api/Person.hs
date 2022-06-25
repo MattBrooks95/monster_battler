@@ -71,6 +71,10 @@ import Happstack.Server (
 		badRequest
 	)
 
+import Helpers.Printing (
+		printWithBorder
+	)
+
 import Control.Monad.Reader
 
 person :: ServerPart Response
@@ -93,10 +97,11 @@ person = msum [
 					method GET
 					--get people entities from database
 					peopleEntities <- liftIO getPeople
-					liftIO $ print "########################"
-					liftIO $ print peopleEntities
-					-- convert the entities into actual person objects
-					liftIO $ print "########################"
+					liftIO $ printWithBorder peopleEntities
+					--liftIO $ print "########################"
+					--liftIO $ print peopleEntities
+					---- convert the entities into actual person objects
+					--liftIO $ print "########################"
 					let people = map entityVal peopleEntities
 					liftIO $ print people
 

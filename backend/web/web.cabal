@@ -23,6 +23,7 @@ library
   exposed-modules:
       Data.Database
       Data.Person
+      Helpers.Printing
       Lib
   other-modules:
       Paths_web
