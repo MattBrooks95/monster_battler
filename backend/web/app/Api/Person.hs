@@ -75,22 +75,21 @@ import Control.Monad.Reader
 
 person :: ServerPart Response
 person = msum [
-				--do
-				--	method PUT
-				--	request <- askRq
-				--	body <- takeRequestBody request
-				--	case body of
-				--		Just body -> liftIO $ print "just body"
-				--		Nothing -> liftIO $ print "take body failure"
-				--	let personObjectFromRequest = getPersonFromBody body
-				--	liftIO $ print (show personObjectFromRequest)
-				--	case personObjectFromRequest of
-				--		Nothing -> badRequest $ toResponse ("failure to decode request body or JSON" :: String)
-				--		Just person -> do
-				--			personId <- liftIO $ insertPerson person
-				--			ok $ toResponse ("added person" ++ (show personId))
-				--, do
 				do
+					method PUT
+					request <- askRq
+					body <- takeRequestBody request
+					case body of
+						Just body -> liftIO $ print "just body"
+						Nothing -> liftIO $ print "take body failure"
+					let personObjectFromRequest = getPersonFromBody body
+					liftIO $ print (show personObjectFromRequest)
+					case personObjectFromRequest of
+						Nothing -> badRequest $ toResponse ("failure to decode request body or JSON" :: String)
+						Just person -> do
+							personId <- liftIO $ insertPerson person
+							ok $ toResponse ("added person" ++ (show personId))
+				, do
 					method GET
 					--get people entities from database
 					peopleEntities <- liftIO getPeople
@@ -107,19 +106,6 @@ person = msum [
 					--ok $ toResponse jsonPeople
 					ok $ toResponse jsonPeople
 
-					--liftIO $ print people
-					--let entityPeople = toEntities people
-					--liftIO $ print entityPeople
-					--jsonPeople <- entitiesToJson $ toEntities people
-					--liftIO $ print jsonPeople
-					--couldn't match type IO [LB.ByteString] with IO [LB.ByteString]
-					--let responseMap = Map.fromList ([("people", entitiesToJson $ toEntities people)]) :: Map.Map String [LB.ByteString]
-					--let responseMap = Map.fromList ([("people", entitiesToJson $ toEntities people)]) :: Map.Map String (IO [LB.ByteString])
-					--jsonPeople <- entitiesToJson $ toEntities people-- :: IO [LB.ByteString]
-					--responseMap <- Map.fromList ([("people", jsonPeople)]) :: Map.Map String [LB.ByteString]
-					--ok $ toResponse $ fmap encode responseMap
-					--ok $ toResponse jsonPeople
-					--ok $ toResponse ("compile" :: String)
 				--do
 				--	method GET
 				--	ok $ toResponse "api/person get",
