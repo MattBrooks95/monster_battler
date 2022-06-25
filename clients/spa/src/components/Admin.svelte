@@ -6,8 +6,12 @@ onMount(async () => {
 		method: 'GET'
 	});
 	console.log(response);
-	const respJson = await response.json();
-	console.log(respJson, JSON.parse(respJson));
+	const respText = await response.text();
+	console.log(respText, typeof respText);
+	console.log(JSON.parse(respText));
+
+	//const respJson = await response.json();
+	//console.log(respJson, JSON.parse(respJson));
 
 });
 
