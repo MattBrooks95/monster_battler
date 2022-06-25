@@ -98,22 +98,16 @@ person = msum [
 					--get people entities from database
 					peopleEntities <- liftIO getPeople
 					liftIO $ printWithBorder peopleEntities
-					--liftIO $ print "########################"
-					--liftIO $ print peopleEntities
-					---- convert the entities into actual person objects
-					--liftIO $ print "########################"
+					-- turn the persist entities into actual objects
 					let people = map entityVal peopleEntities
-					liftIO $ print people
+					liftIO $ printWithBorder people
 
+					-- turn the objects into json TODO wrap in in a Data.Map { people: values }, right now it's just an array
 					let jsonPeople = encode people
-					liftIO $ print "#####################"
-					liftIO $ print jsonPeople
-					--ok $ toResponse jsonPeople
+					liftIO $ printWithBorder jsonPeople
+					-- happstack json response
 					ok $ toResponse jsonPeople
 
-				--do
-				--	method GET
-				--	ok $ toResponse "api/person get",
 				--do
 				--	method DELETE
 				--	ok $ toResponse "api/person delete"
