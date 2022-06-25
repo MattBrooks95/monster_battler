@@ -43,17 +43,3 @@ main = simpleHTTP nullConf $ msum
 	--do dir "static" $ serveDirectory DisableBrowsing [] "static"
 	----seeOther "welcome" ""
 	]
-
---apiRouting :: (ToMessage a) => ServerPartT IO a
---apiRouting = do
---	dir "person" (do method PUT ok $ toResponse "api/person")
-
---personHandler :: ServerPartT IO String
---personHandler = return (method PUT (return ok $ toResponse "api/person"))
-
---api :: ServerPartT IO Response
---api = msum
---	[
---		dir "person" person
---	]
-
