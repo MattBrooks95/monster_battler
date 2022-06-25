@@ -131,13 +131,6 @@ person = msum [
 getBodyFromRequest :: RqBody -> LB.ByteString
 getBodyFromRequest requestBody = unBody requestBody
 
-toEntities :: Functor f => f [Entity b] -> f [b]
-toEntities = fmap $ map entityVal
-
---entitiesToJson :: (Functor f, ToJSON a) => f [a] -> f [Data.ByteString.Lazy.Internal.ByteString]
-entitiesToJson :: (Functor f, ToJSON a) => f [a] -> f [LB.ByteString]
-entitiesToJson = fmap (map encode)
-
 getPersonFromBody :: Maybe RqBody -> Maybe Person
 getPersonFromBody body = case body of
 	Just body -> (decode $ unBody body)
