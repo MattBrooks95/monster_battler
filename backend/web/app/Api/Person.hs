@@ -115,9 +115,9 @@ person = msum [
 			] :: ServerPartT IO Response
 
 getBodyFromRequest :: RqBody -> LB.ByteString
-getBodyFromRequest requestBody = unBody requestBody
+getBodyFromRequest = unBody
 
 getPersonFromBody :: Maybe RqBody -> Maybe Person
 getPersonFromBody body = case body of
-	Just body -> (decode $ unBody body)
+	Just body -> decode $ unBody body
 	Nothing -> Nothing
