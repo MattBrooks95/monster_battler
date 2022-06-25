@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
-
 {-# LANGUAGE EmptyDataDecls             #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GADTs                      #-}
@@ -38,6 +37,11 @@ import Data.Database (
 		connStr
 	)
 
+import Data.Person (
+		getPeople,
+		insertPerson,
+	)
+
 import qualified Data.ByteString.Lazy as LB
 
 import Happstack.Server (
@@ -59,9 +63,6 @@ import Happstack.Server (
 	)
 
 import Control.Monad.Reader
-
---data PersonJson = PersonJson { name::String } deriving (Show, Generic, ToJSON, FromJSON)
-
 
 person :: ServerPartT IO Response
 person = msum [
@@ -114,43 +115,3 @@ getPersonFromBody :: Maybe RqBody -> Maybe Person
 getPersonFromBody body = case body of
 	Just body -> (decode $ unBody body)
 	Nothing -> Nothing
-
---TODO this code can be moved to a database module
---runStderrLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
---flip runSqlPersistMPool pool $ do
-insertPerson :: Person -> IO (Database.Persist.Postgresql.Key Person)
---insertPerson person = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
---	personId <- flip runSqlPersistMPool pool $ insert $ Person $ name person
---	putStrLn $ show personId
-insertPerson person = runNoLoggingT $ withPostgresqlConn connStr $ \backend -> runReaderT (insert $ person) backend
-
---TODO figure out how to properly use this connection pool, and only
---instantiate one, doing it here and in insertPerson is probably really not good
---in ghci, I was playing around with how to get the actual Person values out of these
---io actions:
---ghci> fmap (\x -> fmap entityVal x) myPeople
---[Person {personName = "success"},Person {personName = "person 2"}]
---there's gotta be abetter way than calling fmap twice
---I learned that I can do this:
---let myPeople = getPeople
---ghci> fmap (map entityVal) myPeople
---[Person {personName = "first person in database!!!"},Person {personName = "name 2"}]
---`fmap entityVal person` is no good because it is prepared to handle the IO monad, but it is not
---prepared to also handle the List monad. `map entityVal` uses partial function application
---to create a function that has the type map entityVal :: [Entity b] -> [b]
---which is a pure function that turns People Entities (from the Database library), into People objects
---so, by passing that into fmap, we get this:
---ghci> :t fmap (map entityVal)
---fmap (map entityVal) :: Functor f => f [Entity b] -> f [b]
---so, this code can turn Entities in the IO monad into People in the IO monad
---I should be able to continue this train of thought to be able to go from Database Object -> JSON
---getPeople :: IO [Entity Person]
---getPeople = runNoLoggingT $ withPostgresqlPool connStr 10 $ \pool -> liftIO $ do
---	people  <- (flip runSqlPersistMPool pool $ selectList [] []) :: IO [Entity Person]
---	--print $ "recordName:" ++ (show people)
---	--return people
---	return people
-
-getPeople :: IO [Entity Person]
-getPeople = runNoLoggingT $ withPostgresqlConn connStr $ \backend -> runReaderT (selectList [] []) backend
-

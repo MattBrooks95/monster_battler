@@ -22,6 +22,7 @@ source-repository head
 library
   exposed-modules:
       Data.Database
+      Data.Person
       Lib
   other-modules:
       Paths_web
