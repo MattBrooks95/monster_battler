@@ -119,19 +119,23 @@ getTypes :: IO[Entity Type]
 getTypes = runNoLoggingT $ withPostgresqlConn connStr $ \dbConnection -> liftIO $ do
 	runReaderT (selectList [] []) dbConnection
 
-makeTypeMatchups :: IO ()
+--I got them into the database, but I think it's doing updates in a loop
+--this is potentially bad for performance and means that I had to change the type of this function from
+--IO () to IO [()]
+makeTypeMatchups :: IO [()]
 makeTypeMatchups = runNoLoggingT $ withPostgresqlConn connStr $ \dbConnection -> liftIO $ do
 	typeEntities <- runReaderT (selectList [] []) dbConnection :: IO[Entity Type]
 	printWithBorder typeEntities
 	let typeNameToKeyMap = Map.fromList [ (getTypeName entity, typeNameToKey (getTypeName entity) typeEntities) | entity <- typeEntities]
 	printWithBorder typeNameToKeyMap
 	--let matchupsListAsKeys = [ ((typeNameToKeyMap Map.! (fst matchup)), [], []) | matchup <- matchups] :: [(Database.Persist.Key Type, [], [])]
-	let matchupsListAsKeys = [ (typeNameToKeyMap Map.! (fst matchup), (map (typeNameToKeyMap Map.!) (fst $ snd matchup), map (typeNameToKeyMap Map.!) (snd $ snd matchup))) | matchup <- matchups] :: [(Database.Persist.Key Type, ([TypeId], [TypeId]))]
+	let matchupsListAsKeys = [ (typeNameToKeyMap Map.! fst matchup, (map (typeNameToKeyMap Map.!) (fst $ snd matchup), map (typeNameToKeyMap Map.!) (snd $ snd matchup))) | matchup <- matchups] :: [(Database.Persist.Key Type, ([TypeId], [TypeId]))]
 	printWithBorder matchupsListAsKeys
 	--map (\typeEntity -> update (entityKey typeEntity) [TypeStrongAttacks .= (fst $ snd entityTuple), TypeResists .= (snd $ snd entityTuple)]) typeEntities
 	--it's complaining that runReaderT is only good for one action, gotta map it somehow
 	--runReaderT (map (\matchup -> update (fst matchup) [TypeStrongAttacks =. (fst $ snd matchup), TypeResists =. (snd $ snd matchup)]) matchupsListAsKeys) dbConnection
-	map (\matchup -> runReaderT (update (fst matchup) [TypeStrongAttacks =. (fst $ snd matchup), TypeResists =. (snd $ snd matchup)]) dbConnection) matchupsListAsKeys--runReaderT (map (\matchup -> update (fst matchup) [TypeStrongAttacks =. (fst $ snd matchup), TypeResists =. (snd $ snd matchup)]) matchupsListAsKeys) dbConnection
+	let updateActions = map (\matchup -> update (fst matchup) [TypeStrongAttacks =. fst (snd matchup), TypeResists =. snd (snd matchup)]) matchupsListAsKeys--runReaderT (map (\matchup -> update (fst matchup) [TypeStrongAttacks =. (fst $ snd matchup), TypeResists =. (snd $ snd matchup)]) matchupsListAsKeys) dbConnection
+	mapM (\action -> runReaderT action dbConnection) updateActions
 
 	--mapM_ (\entityTuple -> runReaderT $ (update (fst entityTuple) [TypeStrongAttacks .= (fst $ snd entityTuple), TypeResists .= (snd $ snd entityTuple)]) dbConnection) matchupsListAsKeys
 	--map (\entityTuple -> (update (fst entityTuple) [TypeStrongAttacks .= (fst $ snd entityTuple), TypeResists .= (snd $ snd entityTuple)])) matchupsListAsKeys
