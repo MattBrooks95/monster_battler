@@ -79,6 +79,7 @@ ghost = "Ghost"
 esper = "Esper"
 beast = "Beast"
 bug = "Bug"
+-- (X, [Y], [Z]), where type X's attacks are strong against Y and X is weak to attacks from Z
 matchups = [
 		(astral, ([holy, beast], [beast, holy])),
 		(dark,  ([astral, esper], [esper, astral])),
