@@ -95,7 +95,7 @@ matchups = [
 typeNameToKey :: String -> [Entity Type] -> Database.Persist.Key Type
 typeNameToKey typeName entitiesList = entityKey $ fromJust targetEntity
 	where
-		targetEntity = find (\entity -> (getTypeName entity) == typeName) entitiesList :: Maybe(Entity Type)
+		targetEntity = find (\entity -> getTypeName entity == typeName) entitiesList :: Maybe(Entity Type)
 
 getTypeName :: Entity Type -> String
 getTypeName = typeName . entityVal
@@ -134,40 +134,8 @@ makeTypeMatchups = runNoLoggingT $ withPostgresqlConn connStr $ \dbConnection ->
 	--map (\typeEntity -> update (entityKey typeEntity) [TypeStrongAttacks .= (fst $ snd entityTuple), TypeResists .= (snd $ snd entityTuple)]) typeEntities
 	--it's complaining that runReaderT is only good for one action, gotta map it somehow
 	--runReaderT (map (\matchup -> update (fst matchup) [TypeStrongAttacks =. (fst $ snd matchup), TypeResists =. (snd $ snd matchup)]) matchupsListAsKeys) dbConnection
+	--'list up' the actions that I want to be done [insert the type matchup keys into the entities]
 	let updateActions = map (\matchup -> update (fst matchup) [TypeStrongAttacks =. fst (snd matchup), TypeResists =. snd (snd matchup)]) matchupsListAsKeys--runReaderT (map (\matchup -> update (fst matchup) [TypeStrongAttacks =. (fst $ snd matchup), TypeResists =. (snd $ snd matchup)]) matchupsListAsKeys) dbConnection
+	--then, use mapM to 'run' those actions through the run reader transformer 
 	mapM (\action -> runReaderT action dbConnection) updateActions
-
-	--mapM_ (\entityTuple -> runReaderT $ (update (fst entityTuple) [TypeStrongAttacks .= (fst $ snd entityTuple), TypeResists .= (snd $ snd entityTuple)]) dbConnection) matchupsListAsKeys
-	--map (\entityTuple -> (update (fst entityTuple) [TypeStrongAttacks .= (fst $ snd entityTuple), TypeResists .= (snd $ snd entityTuple)])) matchupsListAsKeys
-	--update $ (fst $ head matchupsListAsKeys) [TypeStrongAttacks .= (fst $ snd (head matchupsListAsKeys)), TypeResists .= (snd $ snd ( head matchupsListAsKeys))]
-
-	--mapM_ (\entity -> update (entityKey entity) [TypeStrongAttacks .= , TypeResists .=]) typeEntities
-	--let entitiesWithMatchups = [ getMatchups $ typeNameToKey x | x <- typeEntities]
-
---makeTypeMatchups :: IO ()
---makeTypeMatchups = runNoLoggingT $ withPostgresqlConn connStr $ \dbConnection -> liftIO $ do
---	types <- runReaderT (selectList [] []) dbConnection :: IO[Entity Type]
---	print types
---	let updatedTypes = map getMatchup types
---	print updatedTypes
---
---getMatchup :: Entity Type -> [Entity Type] -> Maybe ([Database.Persist.Key Type], [Database.Persist.Key Type])
---getMatchup typeEntity typeEntitiesList =
---	(find (\x -> (typeName $ entityVal x) ) typeEntitiesList, find
---	where
---		matchupLookupResult = fromJust $ lookup (typeName $ entityVal typeEntity) matchups
---		thisTypeName = typeName $ entityVal typeEntity
-
-
--- this infinite looped as it was evaluating the types that were referencing eachother, I think
--- or perhaps it was the ghost <---> ghost reciprocal weakness
--- \backend -> runReaderT (insertMany_ [astral, dark, holy, ghost, esper, beast, bug]) backend
---where
---	astral = Type { typeName = "Astral", typeStrongAttacks = [holy, beast], typeResists = [beast, holy] }
---	dark = Type { typeName = "Dark", typeStrongAttacks = [astral, esper], typeResists = [esper, astral] }
---	holy = Type { typeName = "Holy", typeStrongAttacks = [dark, ghost], typeResists = [dark, ghost, holy] }
---	ghost = Type { typeName = "Ghost", typeStrongAttacks = [ghost, esper], typeResists = [beast] }
---	esper = Type { typeName = "Esper", typeStrongAttacks = [ghost], typeResists = [holy] }
---	beast = Type { typeName = "Beast", typeStrongAttacks = [esper, bug], typeResists = [bug] }
---	bug = Type { typeName = "Bug", typeStrongAttacks = [esper], typeResists = [] }
 
