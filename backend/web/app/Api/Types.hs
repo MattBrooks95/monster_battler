@@ -7,12 +7,16 @@ import Control.Monad.Logger
 import Database.Persist
 import Database.Persist.Postgresql
 
+import qualified Data.Map as Map
+
 import Data.Database (
 		Type(..),
+		TypeId,
 		connStr
 	)
 import Data.Aeson (
-		encode
+		encode,
+		Object
 	)
 
 import Happstack.Server (
@@ -38,10 +42,9 @@ types = msum [
 		do
 			method GET
 			typeEntities <- liftIO getTypes
-			liftIO $ printWithBorder typeEntities
-			let types = map entityVal typeEntities
-			liftIO $ printWithBorder types
+			let types = [ (entityKey entity, entityVal entity) | entity <- typeEntities]
+			--liftIO $ printWithBorder types
 			let jsonTypes = encode types
-			liftIO $ printWithBorder jsonTypes
+			--liftIO $ printWithBorder jsonTypes
 			ok $ toResponse jsonTypes
 	]
