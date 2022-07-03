@@ -9,9 +9,11 @@ import Happstack.Server (
 	)
 
 import Api.Person
+import Api.Types
 
 api :: ServerPartT IO Response
 api = msum
 	[
-		dir "person" person
+		dir "person" person,
+		dir "types" types
 	]

@@ -60,7 +60,7 @@ Type
 	name String
 	strongAttacks [TypeId]
 	resists [TypeId]
-	deriving Show
+	deriving Show Generic ToJSON
 |]
 
 -- TODO can't do this in production
@@ -115,10 +115,6 @@ makeTypes = runNoLoggingT $ withPostgresqlConn connStr $ \dbConnection -> liftIO
 			Type { typeName = "Beast", typeStrongAttacks = [], typeResists = [] },
 			Type { typeName = "Bug", typeStrongAttacks = [], typeResists = [] }
 		]
-
-getTypes :: IO[Entity Type]
-getTypes = runNoLoggingT $ withPostgresqlConn connStr $ \dbConnection -> liftIO $ do
-	runReaderT (selectList [] []) dbConnection
 
 --I got them into the database, but I think it's doing updates in a loop
 --this is potentially bad for performance and means that I had to change the type of this function from

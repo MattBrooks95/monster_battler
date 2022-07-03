@@ -2,13 +2,15 @@
 import Signup from "./Signup.svelte";
 import Admin from "./Admin.svelte";
 import Monsters from "./Monsters.svelte";
+import Types from "./Types.svelte";
 
 const pages = [
 	["Home", null],
 	["Signup", Signup],
 	["Accounts", null],
 	["Admin", Admin],
-	["Monsters", Monsters]
+	["Monsters", Monsters],
+	["Types", Types]
 ];
 
 let selectedComponent = pages[0][1];

@@ -48,6 +48,7 @@ executable web-exe
   other-modules:
       Api
       Api.Person
+      Api.Types
       Paths_web
   hs-source-dirs:
       app
