@@ -1,4 +1,4 @@
-# Moster Battler
+# Monster Battler
 
 ## What it is
 1. 1 player vs 1 player, 4 player free-for-all, 2 players v 2 players
