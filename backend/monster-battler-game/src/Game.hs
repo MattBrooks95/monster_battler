@@ -7,7 +7,7 @@ data BattleMode = FreeForAll deriving Show
 
 data GameResult = GameResult {
 	victors :: [[Player]]
-}
+} deriving Show
 
 data Game = Game {
 	player_teams :: [[Player]],

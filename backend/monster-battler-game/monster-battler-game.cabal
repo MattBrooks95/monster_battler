@@ -32,7 +32,6 @@ library
       Game.Player
       Interactions.Interaction
       Lib
-      MyLib
       Primitives.Combat
   other-modules:
       Paths_monster_battler_game

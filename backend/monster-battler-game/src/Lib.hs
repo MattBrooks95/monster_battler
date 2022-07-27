@@ -1,8 +1,9 @@
-module MyLib where
+module Lib where
 import Game
 
-testGame :: Game -> IO GameResult
-testGame game = do
+testGame :: IO ()
+testGame = do
 	print "testGame"
-	print game
-	return $ runGame game
+	let dummyGame = Game { player_teams = [], battle_mode = FreeForAll }
+	print dummyGame
+	print $ runGame dummyGame
