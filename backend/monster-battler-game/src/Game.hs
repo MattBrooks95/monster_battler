@@ -1,5 +1,12 @@
 module Game where
 import Game.Player
+import Game.PlayerAction (
+		PotentialAction(..),
+		Action(..),
+		Switch(..),
+		Forfeit(..),
+		Move(..),
+	)
 
 --support 2 players vs 2 players
 --data BattleMode = FreeForAll | TeamFreeForAll |
@@ -14,5 +21,5 @@ data Game = Game {
 	battle_mode :: BattleMode
 } deriving Show
 
-runGame :: Game -> GameResult
-runGame game = GameResult { victors = player_teams game } --you're all winners
+getPlayersActions :: Game -> Int -> [PotentialAction]
+getPlayersActions game playerId = [PotentialAction playerId (ActionForfeit Forfeit)]

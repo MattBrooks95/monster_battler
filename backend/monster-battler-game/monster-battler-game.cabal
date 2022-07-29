@@ -31,6 +31,8 @@ library
       Entity.Move
       Game
       Game.Player
+      Game.PlayerAction
+      Input.TerminalInput
       Interactions.Interaction
       Lib
       Primitives.Combat
