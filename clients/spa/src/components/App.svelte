@@ -1,11 +1,12 @@
 <script>
+import Home from "./Home.svelte";
 import Signup from "./Signup.svelte";
 import Admin from "./Admin.svelte";
 import Monsters from "./Monsters.svelte";
 import Types from "./Types.svelte";
 
 const pages = [
-	["Home", null],
+	["Home", Home],
 	["Signup", Signup],
 	["Accounts", null],
 	["Admin", Admin],
@@ -30,7 +31,6 @@ function updateSelectedComponent(newPageIndex) {
 <button on:click={() => updateSelectedComponent(index)}>{page[0]}</button>
 {/each}
 </div>
-
 <svelte:component this={selectedComponent}/>
 </div>
 

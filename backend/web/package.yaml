@@ -31,6 +31,7 @@ dependencies:
 - mtl
 - utf8-string
 - containers
+- uuid
 
 library:
   source-dirs: src

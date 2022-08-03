@@ -111,7 +111,7 @@ person = msum [
 				--do
 				--	method DELETE
 				--	ok $ toResponse "api/person delete"
-			] :: ServerPartT IO Response
+			] :: ServerPart Response
 
 getBodyFromRequest :: RqBody -> LB.ByteString
 getBodyFromRequest = unBody
