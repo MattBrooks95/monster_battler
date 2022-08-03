@@ -2,6 +2,9 @@ module Api.Game where
 
 import Control.Monad
 import Control.Monad.IO.Class
+import Control.Concurrent (
+		modifyMVar
+	)
 
 import Data.UUID (
 		toString,
@@ -27,8 +30,12 @@ import Data.Map (
 	)
 import qualified Data.Map as Map
 
-game :: ServerPart Response
-game = do
+import ServerState (
+		ServerState(..)
+	)
+
+game :: ServerState -> ServerPart Response
+game state = do
 	liftIO $ print "in game"
 	msum [
 			do
@@ -37,4 +44,21 @@ game = do
 					gameId <- liftIO nextRandom
 					liftIO $ print gameId
 					ok $ toResponse $ encode $ fromList [("gameCode", gameId)]
+				dir "connect" $ do
+					method GET
+					request <- askRq
+					body <- takeRequestBody request
+					case body of
+						Just body -> do
+							bodyJson <- decode $ unbody body
+							case bodyJson of
+							-- TODO create a websocket connection when the client sends
+							-- a connection request with the uuid we gave them
+							-- will need a way to figure out who is player one and who is player two
+							-- probably, when the game code is created we should just add an entry into
+							-- the server state that specifies the client that requested the code
+							-- as being player one
+								Just connectBody ->
+								Nothing -> ok $ toResponse "game/connect body deserialization failure"
+						Nothing -> ok $ toResponse "bad game/connect body"
 		] :: ServerPartT IO Response

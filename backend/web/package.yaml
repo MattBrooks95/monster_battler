@@ -32,6 +32,8 @@ dependencies:
 - utf8-string
 - containers
 - uuid
+- websockets
+- text
 
 library:
   source-dirs: src

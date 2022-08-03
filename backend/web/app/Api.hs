@@ -15,12 +15,12 @@ import Api.Person
 import Api.Types
 import Api.Game
 
-api :: ServerPartT IO Response
-api = msum
+api :: ServerState -> ServerPartT IO Response
+api state = msum
 	[
 		dir "person" person,
 		dir "types" types,
 		dir "game" $ do
 			liftIO $ print "game api"
-			game
+			game state
 	]
