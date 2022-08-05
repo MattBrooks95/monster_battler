@@ -30,7 +30,6 @@ import Happstack.Server (
 	)
 
 import qualified Network.WebSockets as WS
-import Data.Text (Text)
 
 import ServerState (
 		ServerState(..),

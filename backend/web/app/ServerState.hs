@@ -1,5 +1,7 @@
 module ServerState where
 
+import Data.Text (Text)
+import qualified Data.Text as T
 import qualified Network.WebSockets as WS
 
 data GamePlayerConnection = GamePlayerConnection {
@@ -9,5 +11,10 @@ data GamePlayerConnection = GamePlayerConnection {
 
 data Game = Game { playerOneRoll::Int, playerTwoRoll::Int }
 
-type GameInstance = (Text, Game, GamePlayerConnection, GamePlayerConnection)
+data GameInstance = GameInstance {
+		gameCode :: Text,
+		game :: Game,
+		playerOneConnection :: GamePlayerConnection,
+		playerTwoConnection :: GamePlayerConnection
+	}
 data ServerState = ServerState [GameInstance]

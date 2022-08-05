@@ -53,6 +53,7 @@ executable web-exe
       Api.Game
       Api.Person
       Api.Types
+      ServerState
       Paths_web
   hs-source-dirs:
       app

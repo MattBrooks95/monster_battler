@@ -30,6 +30,10 @@ import Data.Map (
 	)
 import qualified Data.Map as Map
 
+import Control.Concurrent (
+		modifyMVar_,
+	)
+
 import ServerState (
 		ServerState(..)
 	)
@@ -50,7 +54,7 @@ game state = do
 					body <- takeRequestBody request
 					case body of
 						Just body -> do
-							bodyJson <- decode $ unbody body
+							bodyJson <- (decode $ unbody body)-- :: Map { gameCode :: String }
 							case bodyJson of
 							-- TODO create a websocket connection when the client sends
 							-- a connection request with the uuid we gave them
@@ -58,7 +62,13 @@ game state = do
 							-- probably, when the game code is created we should just add an entry into
 							-- the server state that specifies the client that requested the code
 							-- as being player one
-								Just connectBody ->
+								Just connectBody -> do
+									let gameCodeFromRequest = gameCode connectBody
+									let gameToConnectTo = find (\x -> gameCodeFromRequest == gameCode x) state
+									case gameToConnectTo of
+										Just gameInstance -> modifyMVar_ \s -> do
+											let s' = (GamePlayerConnection { playerName = "hoge",  } : state
+										Nothing ->
 								Nothing -> ok $ toResponse "game/connect body deserialization failure"
 						Nothing -> ok $ toResponse "bad game/connect body"
 		] :: ServerPartT IO Response
