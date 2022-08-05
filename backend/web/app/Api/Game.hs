@@ -67,7 +67,7 @@ game state = do
 									let gameToConnectTo = find (\x -> gameCodeFromRequest == gameCode x) state
 									case gameToConnectTo of
 										Just gameInstance -> modifyMVar_ \s -> do
-											let s' = (GamePlayerConnection { playerName = "hoge",  } : state
+											let s' = (GamePlayerConnection { playerName = "hoge", } : state
 										Nothing ->
 								Nothing -> ok $ toResponse "game/connect body deserialization failure"
 						Nothing -> ok $ toResponse "bad game/connect body"
